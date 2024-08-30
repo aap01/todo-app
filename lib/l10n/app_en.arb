@@ -1,3 +1,4 @@
 {
-  "completed": "Completed"
+  "completed": "Completed",
+  "addTodoHintText": "New Todo"
 }

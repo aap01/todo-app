@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:todo_app/di/dependency.dart';
+import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:todo_app/feature/todo/presentation/add_todo_widget.dart';
+import 'package:todo_app/feature/todo/presentation/todo_list_widget.dart';
+import 'package:todo_app/feature/todo/presentation/todo_state.dart';
+
+import 'feature/todo/presentation/todo_bloc.dart';
 
 void main() {
+  configureDependencies();
   runApp(const MyApp());
 }
 
@@ -15,10 +26,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const MyHomePage(title: 'Todo App'),
+      // locale: AppLocalizations.supportedLocales.first,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => getIt<TodoBloc>()..loadTodos(),
+          ),
+        ],
+        child: const MyHomePage(title: 'Todo App'),
+      ),
     );
   }
 }
@@ -33,6 +53,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final ScrollController _scrollController = ScrollController();
+
+  late TodoBloc _todoBloc;
+
+  @override
+  initState() {
+    super.initState();
+    _todoBloc = context.read<TodoBloc>();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,17 +70,64 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Under development',
-            ),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  children: [
+                    BlocSelector<TodoBloc, TodoState, List<TodoEntity>>(
+                      selector: (state) => state.incompleteTodos,
+                      builder: (context, todos) {
+                        return TodoListWidget(
+                          scrollController: _scrollController,
+                          todos: todos,
+                          onToggle: _todoBloc.onToggleTodo,
+                          onDelete: _todoBloc.onDeleteTodo,
+                          onEdit: _todoBloc.onUpdateTodoDescription,
+                        );
+                      },
+                    ),
+                    BlocSelector<TodoBloc, TodoState, List<TodoEntity>>(
+                      selector: (state) => state.doneTodos,
+                      builder: (context, todos) {
+                        if (todos.isEmpty) return const SizedBox();
+                        return Column(
+                          children: [
+                            const Gap(32),
+                            Chip(
+                              label:
+                                  Text(AppLocalizations.of(context)!.completed),
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            const Gap(8),
+                            TodoListWidget(
+                              scrollController: _scrollController,
+                              todos: todos,
+                              onToggle: _todoBloc.onToggleTodo,
+                              onDelete: _todoBloc.onDeleteTodo,
+                              onEdit: _todoBloc.onUpdateTodoDescription,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              AddTodoWidget(
+                onAdd: _todoBloc.onAdd,
+              )
+            ],
+          ),
         ),
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
