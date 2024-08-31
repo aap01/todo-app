@@ -32,7 +32,7 @@ class TodoReositoryImpl implements TodoRepository {
 
   @override
   Future<List<TodoEntity>> getAll() async {
-    return _todoBox.values
+    final list = _todoBox.values
         .map(
           (e) => TodoEntity(
             id: e.id,
@@ -41,6 +41,7 @@ class TodoReositoryImpl implements TodoRepository {
           ),
         )
         .toList();
+    return list;
   }
 
   @override

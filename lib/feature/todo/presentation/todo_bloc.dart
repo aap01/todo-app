@@ -27,7 +27,6 @@ class TodoBloc extends Cubit<TodoState> {
         super(TodoInitialState());
 
   Future<void> loadTodos() async {
-    emit(TodoInitialState());
     final todos = await _getAllTodoUsecase();
     final doneTodos = todos.where((todo) => todo.isDone).toList();
     final incompleteTodos = todos.where((todo) => !todo.isDone).toList();
