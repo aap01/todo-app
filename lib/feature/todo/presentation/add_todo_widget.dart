@@ -17,6 +17,9 @@ class _AddTodoWidgetState extends State<AddTodoWidget> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      textInputAction: TextInputAction.done,
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
       controller: _textController,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

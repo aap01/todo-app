@@ -44,6 +44,9 @@ class TodoWidget extends StatelessWidget {
           const Gap(8),
           Expanded(
             child: TextFormField(
+              textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
