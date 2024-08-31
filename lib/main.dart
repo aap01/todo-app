@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:todo_app/di/dependency.dart';
 import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
 import 'package:todo_app/feature/todo/presentation/add_todo_widget.dart';
@@ -11,8 +12,11 @@ import 'package:todo_app/feature/todo/presentation/todo_state.dart';
 
 import 'feature/todo/presentation/todo_bloc.dart';
 
-void main() {
-  configureDependencies();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // WARNING: Need to check if the elements persist
+  Hive.init(null);
+  await configureDependencies();
   runApp(const MyApp());
 }
 

@@ -9,5 +9,5 @@ class DeleteTodoUsecase {
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  void call(String id) => _todoRepository.remove(id);
+  Future<void> call(int id) => _todoRepository.remove(id);
 }

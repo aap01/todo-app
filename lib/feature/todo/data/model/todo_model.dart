@@ -1,29 +1,29 @@
-import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
+part 'todo_model.g.dart';
 
-class TodoEntity extends Equatable {
+@HiveType(typeId: 0)
+class TodoModel {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String description;
+
+  @HiveField(2)
   final bool isDone;
 
-  const TodoEntity({
-    required this.id,
+  TodoModel({
+    this.id = 0,
     required this.description,
     required this.isDone,
   });
 
-  @override
-  List<Object?> get props => [
-        id,
-        description,
-        isDone,
-      ];
-
-  TodoEntity copyWith({
+  TodoModel copyWith({
     int? id,
     String? description,
     bool? isDone,
   }) {
-    return TodoEntity(
+    return TodoModel(
       id: id ?? this.id,
       description: description ?? this.description,
       isDone: isDone ?? this.isDone,

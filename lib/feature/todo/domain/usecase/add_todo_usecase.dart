@@ -9,5 +9,5 @@ class AddTodoUsecase {
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  void call(String description) => _todoRepository.add(description);
+  Future<void> call(String description) => _todoRepository.add(description);
 }

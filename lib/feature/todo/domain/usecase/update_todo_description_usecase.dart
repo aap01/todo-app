@@ -9,10 +9,10 @@ class UpdateTodoDescriptionUsecase {
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  void call(String id, String description) {
+  Future<void> call(int id, String description) async {
     final todo = _todoRepository.findById(id);
     if (todo != null) {
-      _todoRepository.update(todo.copyWith(description: description));
+      await _todoRepository.update(todo.copyWith(description: description));
     }
   }
 }

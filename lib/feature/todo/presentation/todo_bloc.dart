@@ -34,8 +34,8 @@ class TodoBloc extends Cubit<TodoState> {
         _undoCompleteTodoUsecase = undoCompleteTodoUsecase,
         super(TodoInitialState());
 
-  void loadTodos() {
-    final todos = _getAllTodoUsecase();
+  Future<void> loadTodos() async {
+    final todos = await _getAllTodoUsecase();
     final doneTodos = todos.where((todo) => todo.isDone).toList();
     final incompleteTodos = todos.where((todo) => !todo.isDone).toList();
     emit(
@@ -46,39 +46,42 @@ class TodoBloc extends Cubit<TodoState> {
     );
   }
 
-  void onAdd(String? description) {
+  Future<void> onAdd(String? description) async {
     if (description == null) return;
     final trimmed = description.trim();
     if (trimmed.isEmpty) return;
-    _addTodoUsecase(description.trim());
-    loadTodos();
+    await _addTodoUsecase(description.trim());
+    await loadTodos();
   }
 
-  void onToggleTodo(TodoEntity todoEntity) {
+  Future<void> onToggleTodo(TodoEntity todoEntity) async {
     if (todoEntity.isDone) {
-      _undoCompleteTodoUsecase(todoEntity.id);
+      await _undoCompleteTodoUsecase(todoEntity.id);
     } else {
-      _completeTodoUsecase(todoEntity.id);
+      await _completeTodoUsecase(todoEntity.id);
     }
-    loadTodos();
+    await loadTodos();
   }
 
-  void onDeleteTodo(TodoEntity todo) {
-    _deleteTodoUsecase(todo.id);
-    loadTodos();
+  Future<void> onDeleteTodo(TodoEntity todo) async {
+    await _deleteTodoUsecase(todo.id);
+    await loadTodos();
   }
 
-  void onUpdateTodoDescription(TodoEntity todo, String? description) {
+  Future<void> onUpdateTodoDescription(
+    TodoEntity todo,
+    String? description,
+  ) async {
     if (description == null) {
-      onDeleteTodo(todo);
+      await onDeleteTodo(todo);
       return;
     }
     final trimmed = description.trim();
     if (trimmed.isEmpty) {
-      onDeleteTodo(todo);
+      await onDeleteTodo(todo);
       return;
     }
-    _updateTodoDescriptionUsecase(todo.id, description);
-    loadTodos();
+    await _updateTodoDescriptionUsecase(todo.id, description);
+    await loadTodos();
   }
 }

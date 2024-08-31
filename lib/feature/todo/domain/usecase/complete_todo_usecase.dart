@@ -8,10 +8,10 @@ class CompleteTodoUsecase {
   CompleteTodoUsecase({
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
-  void call(String id) {
+  Future<void> call(int id) async {
     final todo = _todoRepository.findById(id);
     if (todo != null) {
-      _todoRepository.update(todo.copyWith(isDone: true));
+      await _todoRepository.update(todo.copyWith(isDone: true));
     }
   }
 }

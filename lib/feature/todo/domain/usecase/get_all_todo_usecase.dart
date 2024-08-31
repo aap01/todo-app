@@ -9,7 +9,7 @@ class GetAllTodoUsecase {
   GetAllTodoUsecase({required TodoRepository todoRepository})
       : _todoRepository = todoRepository;
 
-  List<TodoEntity> call() {
+  Future<List<TodoEntity>> call() {
     return _todoRepository.getAll();
   }
 }
