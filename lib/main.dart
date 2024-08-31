@@ -67,6 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
   late TodoBloc _todoBloc;
 
   @override
+  void dispose() {
+    _todoBloc.close();
+    _scrollController.dispose();
+    Hive.close();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     _todoBloc = context.read<TodoBloc>();
     super.didChangeDependencies();
