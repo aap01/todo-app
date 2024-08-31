@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1018231486349',
     projectId: 'todo-app-6ff79',
     storageBucket: 'todo-app-6ff79.appspot.com',
+    iosClientId: '1018231486349-vn94outsdo80dgne7fmuov6nvoq4bcjv.apps.googleusercontent.com',
     iosBundleId: 'com.alif.todoApp',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1018231486349',
     projectId: 'todo-app-6ff79',
     storageBucket: 'todo-app-6ff79.appspot.com',
+    iosClientId: '1018231486349-vn94outsdo80dgne7fmuov6nvoq4bcjv.apps.googleusercontent.com',
     iosBundleId: 'com.alif.todoApp',
   );
 
@@ -85,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'todo-app-6ff79.appspot.com',
     measurementId: 'G-4N8C4EWR46',
   );
+
 }
