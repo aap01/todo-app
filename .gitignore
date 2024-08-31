@@ -45,3 +45,4 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 macos/Flutter/GeneratedPluginRegistrant.swift
+.firebase
