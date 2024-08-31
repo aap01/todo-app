@@ -4,7 +4,7 @@ part 'todo_model.g.dart';
 @HiveType(typeId: 0)
 class TodoModel {
   @HiveField(0)
-  final int id;
+  final String id;
 
   @HiveField(1)
   final String description;
@@ -13,13 +13,13 @@ class TodoModel {
   final bool isDone;
 
   TodoModel({
-    this.id = 0,
+    required this.id,
     required this.description,
     required this.isDone,
   });
 
   TodoModel copyWith({
-    int? id,
+    String? id,
     String? description,
     bool? isDone,
   }) {

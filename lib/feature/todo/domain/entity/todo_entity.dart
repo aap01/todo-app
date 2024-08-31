@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class TodoEntity extends Equatable {
-  final int id;
+  final String id;
   final String description;
   final bool isDone;
 
@@ -19,7 +19,7 @@ class TodoEntity extends Equatable {
       ];
 
   TodoEntity copyWith({
-    int? id,
+    String? id,
     String? description,
     bool? isDone,
   }) {

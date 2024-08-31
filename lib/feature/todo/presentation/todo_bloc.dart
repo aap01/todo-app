@@ -1,40 +1,33 @@
 import 'package:injectable/injectable.dart';
-import 'package:todo_app/feature/todo/domain/usecase/undo_complete_todo_usecase.dart';
 import 'package:todo_app/feature/todo/presentation/todo_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../domain/entity/todo_entity.dart';
 import '../domain/usecase/add_todo_usecase.dart';
-import '../domain/usecase/complete_todo_usecase.dart';
 import '../domain/usecase/delete_todo_usecase.dart';
 import '../domain/usecase/get_all_todo_usecase.dart';
-import '../domain/usecase/update_todo_description_usecase.dart';
+import '../domain/usecase/update_todo_usecase.dart';
 
 @injectable
 class TodoBloc extends Cubit<TodoState> {
   final AddTodoUsecase _addTodoUsecase;
-  final CompleteTodoUsecase _completeTodoUsecase;
   final DeleteTodoUsecase _deleteTodoUsecase;
-  final UpdateTodoDescriptionUsecase _updateTodoDescriptionUsecase;
-  final UndoCompleteTodoUsecase _undoCompleteTodoUsecase;
+  final UpdateTodoUsecase _updateTodoUsecase;
   final GetAllTodoUsecase _getAllTodoUsecase;
 
   TodoBloc({
     required AddTodoUsecase addTodoUsecase,
-    required CompleteTodoUsecase completeTodoUsecase,
     required DeleteTodoUsecase deleteTodoUsecase,
-    required UpdateTodoDescriptionUsecase updateTodoDescriptionUsecase,
-    required UndoCompleteTodoUsecase undoCompleteTodoUsecase,
+    required UpdateTodoUsecase updateTodoDescriptionUsecase,
     required GetAllTodoUsecase getAllTodoUsecase,
   })  : _addTodoUsecase = addTodoUsecase,
-        _completeTodoUsecase = completeTodoUsecase,
         _deleteTodoUsecase = deleteTodoUsecase,
-        _updateTodoDescriptionUsecase = updateTodoDescriptionUsecase,
+        _updateTodoUsecase = updateTodoDescriptionUsecase,
         _getAllTodoUsecase = getAllTodoUsecase,
-        _undoCompleteTodoUsecase = undoCompleteTodoUsecase,
         super(TodoInitialState());
 
   Future<void> loadTodos() async {
+    emit(TodoInitialState());
     final todos = await _getAllTodoUsecase();
     final doneTodos = todos.where((todo) => todo.isDone).toList();
     final incompleteTodos = todos.where((todo) => !todo.isDone).toList();
@@ -55,16 +48,12 @@ class TodoBloc extends Cubit<TodoState> {
   }
 
   Future<void> onToggleTodo(TodoEntity todoEntity) async {
-    if (todoEntity.isDone) {
-      await _undoCompleteTodoUsecase(todoEntity.id);
-    } else {
-      await _completeTodoUsecase(todoEntity.id);
-    }
+    await _updateTodoUsecase(todoEntity.copyWith(isDone: !todoEntity.isDone));
     await loadTodos();
   }
 
   Future<void> onDeleteTodo(TodoEntity todo) async {
-    await _deleteTodoUsecase(todo.id);
+    await _deleteTodoUsecase(todo);
     await loadTodos();
   }
 
@@ -81,7 +70,7 @@ class TodoBloc extends Cubit<TodoState> {
       await onDeleteTodo(todo);
       return;
     }
-    await _updateTodoDescriptionUsecase(todo.id, description);
+    await _updateTodoUsecase(todo.copyWith(description: trimmed));
     await loadTodos();
   }
 }

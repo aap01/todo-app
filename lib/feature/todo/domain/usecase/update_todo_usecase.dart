@@ -1,15 +1,15 @@
-import 'package:injectable/injectable.dart';
-
 import '../entity/todo_entity.dart';
 import '../repository/todo_repository.dart';
+import 'package:injectable/injectable.dart';
 
 @injectable
-class DeleteTodoUsecase {
+class UpdateTodoUsecase {
   final TodoRepository _todoRepository;
-  DeleteTodoUsecase({
+
+  UpdateTodoUsecase({
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
   Future<void> call(TodoEntity todoEntity) =>
-      _todoRepository.remove(todoEntity);
+      _todoRepository.update(todoEntity);
 }

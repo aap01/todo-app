@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../domain/repository/todo_repository.dart';
 
@@ -10,33 +11,23 @@ import '../model/todo_model.dart';
 @Injectable(as: TodoRepository)
 class TodoReositoryImpl implements TodoRepository {
   final Box<TodoModel> _todoBox;
+  final Uuid _uuid;
 
   @factoryMethod
   TodoReositoryImpl({
     required Box<TodoModel> todoBox,
-  }) : _todoBox = todoBox;
+    required Uuid uuid,
+  })  : _todoBox = todoBox,
+        _uuid = uuid;
 
   @override
   Future<void> add(String description) async {
     final todoModel = TodoModel(
+      id: _uuid.v4(),
       description: description,
       isDone: false,
     );
-    final id = await _todoBox.add(todoModel);
-    await _todoBox.put(id, todoModel.copyWith(id: id));
-  }
-
-  @override
-  TodoEntity? findById(int id) {
-    final todoModel = _todoBox.get(id);
-    if (todoModel != null) {
-      return TodoEntity(
-        id: todoModel.id,
-        description: todoModel.description,
-        isDone: todoModel.isDone,
-      );
-    }
-    return null;
+    await _todoBox.add(todoModel);
   }
 
   @override
@@ -53,17 +44,36 @@ class TodoReositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<void> remove(int id) async {
-    _todoBox.deleteAt(id);
+  Future<void> remove(TodoEntity todoEntity) async {
+    final index = _getHiveIndex(todoEntity.id);
+    if (index == null) {
+      return;
+    }
+    await _todoBox.deleteAt(index);
   }
 
   @override
   Future<void> update(TodoEntity todoEntity) async {
+    final index = _getHiveIndex(todoEntity.id);
+    if (index == null) {
+      return;
+    }
     final todoModel = TodoModel(
       id: todoEntity.id,
       description: todoEntity.description,
       isDone: todoEntity.isDone,
     );
-    await _todoBox.put(todoEntity.id, todoModel);
+    await _todoBox.put(index, todoModel);
+  }
+
+  int? _getHiveIndex(String id) {
+    try {
+      final index =
+          _todoBox.values.indexed.where((e) => e.$2.id == id).first.$1;
+      return index;
+    } catch (e) {
+      return null;
+      // TODO: report this to crashlytics
+    }
   }
 }
