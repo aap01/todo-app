@@ -17,3 +17,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TODO_APP_6FF79 }}
           channelId: live
           projectId: todo-app-6ff79
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
