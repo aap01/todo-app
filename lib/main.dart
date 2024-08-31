@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      // locale: AppLocalizations.supportedLocales.first,
       home: MultiBlocProvider(
         providers: [
           BlocProvider(
