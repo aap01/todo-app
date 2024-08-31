@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 
+import '../entity/todo_entity.dart';
 import '../repository/todo_repository.dart';
 
 @injectable
@@ -9,5 +10,6 @@ class DeleteTodoUsecase {
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  void call(String id) => _todoRepository.remove(id);
+  Future<void> call(TodoEntity todoEntity) =>
+      _todoRepository.remove(todoEntity);
 }

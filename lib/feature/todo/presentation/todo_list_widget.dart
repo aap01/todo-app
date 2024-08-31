@@ -28,6 +28,7 @@ class TodoListWidget extends StatelessWidget {
       itemBuilder: (cxt, index) {
         final todoEntity = todos[index];
         return TodoWidget(
+          key: Key(todoEntity.id),
           todoEntity: todoEntity,
           onToggle: () => onToggle(todoEntity),
           onDelete: () => onDelete(todoEntity),

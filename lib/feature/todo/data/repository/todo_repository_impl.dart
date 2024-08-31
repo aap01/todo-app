@@ -1,52 +1,80 @@
+import 'package:hive/hive.dart';
 import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../domain/repository/todo_repository.dart';
 
 import 'package:injectable/injectable.dart';
 
+import '../model/todo_model.dart';
+
 @Injectable(as: TodoRepository)
 class TodoReositoryImpl implements TodoRepository {
-  static final _todoList = [
-    const TodoEntity(id: '0', description: 'Todo 1', isDone: false),
-    const TodoEntity(id: '1', description: 'Todo 2', isDone: true),
-    const TodoEntity(id: '2', description: 'Todo 3', isDone: false),
-    const TodoEntity(id: '3', description: 'Todo 4', isDone: true),
-    const TodoEntity(id: '4', description: 'Todo 5', isDone: false),
-    const TodoEntity(id: '5', description: 'Todo 6', isDone: true),
-  ];
+  final Box<TodoModel> _todoBox;
+  final Uuid _uuid;
+
+  @factoryMethod
+  TodoReositoryImpl({
+    required Box<TodoModel> todoBox,
+    required Uuid uuid,
+  })  : _todoBox = todoBox,
+        _uuid = uuid;
 
   @override
-  void add(String description) {
-    _todoList.add(
-      TodoEntity(
-        id: _todoList.length.toString(),
-        description: description,
-        isDone: false,
-      ),
+  Future<void> add(String description) async {
+    final todoModel = TodoModel(
+      id: _uuid.v4(),
+      description: description,
+      isDone: false,
     );
+    await _todoBox.add(todoModel);
   }
 
   @override
-  TodoEntity? findById(String id) {
-    return _todoList.firstWhere((element) => element.id == id);
+  Future<List<TodoEntity>> getAll() async {
+    final list = _todoBox.values
+        .map(
+          (e) => TodoEntity(
+            id: e.id,
+            description: e.description,
+            isDone: e.isDone,
+          ),
+        )
+        .toList();
+    return list;
   }
 
   @override
-  List<TodoEntity> getAll() {
-    return _todoList;
+  Future<void> remove(TodoEntity todoEntity) async {
+    final index = _getHiveIndex(todoEntity.id);
+    if (index == null) {
+      return;
+    }
+    await _todoBox.deleteAt(index);
   }
 
   @override
-  void remove(String id) {
-    _todoList.removeWhere((element) => element.id == id);
+  Future<void> update(TodoEntity todoEntity) async {
+    final index = _getHiveIndex(todoEntity.id);
+    if (index == null) {
+      return;
+    }
+    final todoModel = TodoModel(
+      id: todoEntity.id,
+      description: todoEntity.description,
+      isDone: todoEntity.isDone,
+    );
+    await _todoBox.put(index, todoModel);
   }
 
-  @override
-  void update(TodoEntity todoEntity) {
-    final index =
-        _todoList.indexWhere((element) => element.id == todoEntity.id);
-    if (index != -1) {
-      _todoList[index] = todoEntity;
+  int? _getHiveIndex(String id) {
+    try {
+      final index =
+          _todoBox.values.indexed.where((e) => e.$2.id == id).first.$1;
+      return index;
+    } catch (e) {
+      return null;
+      // TODO: report this to crashlytics
     }
   }
 }

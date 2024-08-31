@@ -46,3 +46,4 @@ app.*.map.json
 .fvm/
 macos/Flutter/GeneratedPluginRegistrant.swift
 .firebase
+ios/Podfile.lock

@@ -1,18 +1,15 @@
+import '../entity/todo_entity.dart';
 import '../repository/todo_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class UndoCompleteTodoUsecase {
+class UpdateTodoUsecase {
   final TodoRepository _todoRepository;
 
-  UndoCompleteTodoUsecase({
+  UpdateTodoUsecase({
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  void call(String id) {
-    final todo = _todoRepository.findById(id);
-    if (todo != null) {
-      _todoRepository.update(todo.copyWith(isDone: false));
-    }
-  }
+  Future<void> call(TodoEntity todoEntity) =>
+      _todoRepository.update(todoEntity);
 }
