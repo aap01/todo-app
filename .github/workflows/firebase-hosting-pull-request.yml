@@ -21,8 +21,11 @@ jobs:
       - name: 📦 Install Dependencies
         run: |
           flutter pub get
-      - name: 🛠️ Generate Packages
-        run: flutter gen-l10n
+      - name: 🛠️ Build
+        run: |
+          flutter gen-l10n
+          flutter build web --release
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
