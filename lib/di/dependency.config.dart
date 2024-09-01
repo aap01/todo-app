@@ -22,6 +22,18 @@ import '../feature/todo/domain/usecase/delete_todo_usecase.dart' as _i306;
 import '../feature/todo/domain/usecase/get_all_todo_usecase.dart' as _i422;
 import '../feature/todo/domain/usecase/update_todo_usecase.dart' as _i489;
 import '../feature/todo/presentation/todo_bloc.dart' as _i896;
+import '../feature/user_settings/data/di/user_settings_hive_module.dart'
+    as _i1027;
+import '../feature/user_settings/data/model/user_settings_model.dart' as _i216;
+import '../feature/user_settings/data/repository/user_settings_repository_impl.dart'
+    as _i740;
+import '../feature/user_settings/domain/repository/user_settings_repository.dart'
+    as _i293;
+import '../feature/user_settings/domain/usecase/get_user_settings.dart'
+    as _i943;
+import '../feature/user_settings/domain/usecase/update_user_settings.dart'
+    as _i831;
+import '../feature/user_settings/presentation/locale_bloc.dart' as _i237;
 import 'shared_module.dart' as _i521;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -35,34 +47,52 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    final userSettginsHiveModule = _$UserSettginsHiveModule();
     final sharedModule = _$SharedModule();
     final todoHiveModule = _$TodoHiveModule();
+    await gh.factoryAsync<_i979.Box<_i216.UserSettingsModel>>(
+      () => userSettginsHiveModule.provideUserSettingsBox(),
+      preResolve: true,
+    );
     gh.singleton<_i706.Uuid>(() => sharedModule.provideUuid());
     await gh.singletonAsync<_i979.Box<_i823.TodoModel>>(
       () => todoHiveModule.provideTodoBox(),
       preResolve: true,
     );
+    gh.factory<_i293.UserSettingsRepository>(() =>
+        _i740.UserSettingsRepositoryImpl(
+            box: gh<_i979.Box<_i216.UserSettingsModel>>()));
     gh.factory<_i953.TodoRepository>(() => _i491.TodoReositoryImpl(
           todoBox: gh<_i979.Box<_i823.TodoModel>>(),
           uuid: gh<_i706.Uuid>(),
         ));
+    gh.factory<_i943.GetUserSettings>(() =>
+        _i943.GetUserSettings(repository: gh<_i293.UserSettingsRepository>()));
+    gh.factory<_i831.UpdateUserSettings>(() => _i831.UpdateUserSettings(
+        repository: gh<_i293.UserSettingsRepository>()));
     gh.factory<_i306.DeleteTodoUsecase>(() =>
         _i306.DeleteTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
     gh.factory<_i273.AddTodoUsecase>(
         () => _i273.AddTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
-    gh.factory<_i422.GetAllTodoUsecase>(() =>
-        _i422.GetAllTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
     gh.factory<_i489.UpdateTodoUsecase>(() =>
         _i489.UpdateTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
+    gh.factory<_i422.GetAllTodoUsecase>(() =>
+        _i422.GetAllTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
     gh.factory<_i896.TodoBloc>(() => _i896.TodoBloc(
           addTodoUsecase: gh<_i273.AddTodoUsecase>(),
           deleteTodoUsecase: gh<_i306.DeleteTodoUsecase>(),
           updateTodoDescriptionUsecase: gh<_i489.UpdateTodoUsecase>(),
           getAllTodoUsecase: gh<_i422.GetAllTodoUsecase>(),
         ));
+    gh.factory<_i237.LocaleBloc>(() => _i237.LocaleBloc(
+          getUserSettings: gh<_i943.GetUserSettings>(),
+          updateUserSettings: gh<_i831.UpdateUserSettings>(),
+        ));
     return this;
   }
 }
+
+class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
 
 class _$SharedModule extends _i521.SharedModule {}
 
