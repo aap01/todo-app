@@ -16,16 +16,16 @@ class LocaleBloc extends Cubit<LocaleState> {
     required UpdateUserSettings updateUserSettings,
   })  : _getUserSettings = getUserSettings,
         _updateUserSettings = updateUserSettings,
-        super(LocaleStateInitial());
+        super(const LocaleState(locale: Locale('en')));
 
   Future<void> loadLocale() async {
     final userSettings = await _getUserSettings();
-    emit(LocaleStateLoaded(locale: userSettings.locale));
+    emit(LocaleState(locale: userSettings.locale));
   }
 
   Future<void> updateLocale(Locale locale) async {
     final userSettings = await _getUserSettings();
     await _updateUserSettings(userSettings.copyWith(locale: locale));
-    emit(LocaleStateLoaded(locale: locale));
+    emit(LocaleState(locale: locale));
   }
 }

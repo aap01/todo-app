@@ -15,32 +15,22 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<LocaleBloc>()..loadLocale(),
-      child: Builder(
-        builder: (context) {
-          return BlocBuilder<LocaleBloc, LocaleState>(
-            builder: (context, state) {
-              Locale? locale;
-              if (state is LocaleStateLoaded) {
-                locale = state.locale;
-              }
-              return MaterialApp(
-                title: 'Todo',
-                theme: ThemeData(
-                  colorScheme:
-                      ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                  useMaterial3: true,
-                  textTheme:
-                      GoogleFonts.outfitTextTheme(Theme.of(context).textTheme),
-                ),
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: AppLocalizations.supportedLocales,
-                locale: locale,
-                home: HomePage(
-                  title: 'Todo App',
-                  locale: locale ?? AppLocalizations.supportedLocales.last,
-                ),
-              );
-            },
+      child: BlocBuilder<LocaleBloc, LocaleState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Todo',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
+              textTheme:
+                  GoogleFonts.outfitTextTheme(Theme.of(context).textTheme),
+            ),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: state.locale,
+            home: const HomePage(
+              title: 'Todo App',
+            ),
           );
         },
       ),
