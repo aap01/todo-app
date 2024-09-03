@@ -1,4 +1,3 @@
-import '../entity/todo_entity.dart';
 import '../repository/todo_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -10,6 +9,10 @@ class UpdateTodoUsecase {
     required TodoRepository todoRepository,
   }) : _todoRepository = todoRepository;
 
-  Future<void> call(TodoEntity todoEntity) =>
-      _todoRepository.update(todoEntity);
+  Future<void> call(id, {String? description, bool? isDone}) =>
+      _todoRepository.update(
+        id,
+        isDone: isDone,
+        description: description,
+      );
 }

@@ -8,13 +8,15 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:hive/hive.dart' as _i979;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:uuid/uuid.dart' as _i706;
 
+import '../feature/todo/data/di/todo_firestore_module.dart' as _i376;
 import '../feature/todo/data/di/todo_hive_module.dart' as _i657;
-import '../feature/todo/data/model/todo_model.dart' as _i823;
+import '../feature/todo/data/model/todo_hive_model.dart' as _i345;
 import '../feature/todo/data/repository/todo_repository_impl.dart' as _i491;
 import '../feature/todo/domain/repository/todo_repository.dart' as _i953;
 import '../feature/todo/domain/usecase/add_todo_usecase.dart' as _i273;
@@ -47,25 +49,28 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
-    final userSettginsHiveModule = _$UserSettginsHiveModule();
-    final sharedModule = _$SharedModule();
     final todoHiveModule = _$TodoHiveModule();
+    final userSettginsHiveModule = _$UserSettginsHiveModule();
+    final todoFirestoreModule = _$TodoFirestoreModule();
+    final sharedModule = _$SharedModule();
+    await gh.factoryAsync<_i979.Box<_i345.TodoHiveModel>>(
+      () => todoHiveModule.provideTodoBox(),
+      preResolve: true,
+    );
     await gh.factoryAsync<_i979.Box<_i216.UserSettingsModel>>(
       () => userSettginsHiveModule.provideUserSettingsBox(),
       preResolve: true,
     );
+    gh.factory<_i974.FirebaseFirestore>(() => todoFirestoreModule.firestore);
     gh.singleton<_i706.Uuid>(() => sharedModule.provideUuid());
-    await gh.singletonAsync<_i979.Box<_i823.TodoModel>>(
-      () => todoHiveModule.provideTodoBox(),
-      preResolve: true,
-    );
+    gh.factory<_i953.TodoRepository>(() => _i491.TodoReositoryImpl(
+          todoBox: gh<_i979.Box<_i345.TodoHiveModel>>(),
+          uuid: gh<_i706.Uuid>(),
+          firestore: gh<_i974.FirebaseFirestore>(),
+        ));
     gh.factory<_i293.UserSettingsRepository>(() =>
         _i740.UserSettingsRepositoryImpl(
             box: gh<_i979.Box<_i216.UserSettingsModel>>()));
-    gh.factory<_i953.TodoRepository>(() => _i491.TodoReositoryImpl(
-          todoBox: gh<_i979.Box<_i823.TodoModel>>(),
-          uuid: gh<_i706.Uuid>(),
-        ));
     gh.factory<_i943.GetUserSettings>(() =>
         _i943.GetUserSettings(repository: gh<_i293.UserSettingsRepository>()));
     gh.factory<_i831.UpdateUserSettings>(() => _i831.UpdateUserSettings(
@@ -92,8 +97,10 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
+class _$TodoHiveModule extends _i657.TodoHiveModule {}
+
 class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
 
-class _$SharedModule extends _i521.SharedModule {}
+class _$TodoFirestoreModule extends _i376.TodoFirestoreModule {}
 
-class _$TodoHiveModule extends _i657.TodoHiveModule {}
+class _$SharedModule extends _i521.SharedModule {}

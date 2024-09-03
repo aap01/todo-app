@@ -28,8 +28,15 @@ class TodoBloc extends Cubit<TodoState> {
 
   Future<void> loadTodos() async {
     final todos = await _getAllTodoUsecase();
-    final doneTodos = todos.where((todo) => todo.isDone).toList();
-    final incompleteTodos = todos.where((todo) => !todo.isDone).toList();
+
+    // item created later shows up last
+    final incompleteTodos = todos.where((todo) => !todo.isDone).toList()
+      ..sort((a, b) => a.createdAt.isBefore(b.createdAt) ? -1 : 1);
+
+    // item done later shows up first
+    final doneTodos = todos.where((todo) => todo.isDone).toList()
+      ..sort((a, b) =>
+          a.doneStatusChangedAt.isBefore(b.doneStatusChangedAt) ? 1 : -1);
     emit(
       TodoLoadedState(
         doneTodos: doneTodos,
@@ -42,17 +49,17 @@ class TodoBloc extends Cubit<TodoState> {
     if (description == null) return;
     final trimmed = description.trim();
     if (trimmed.isEmpty) return;
-    await _addTodoUsecase(description.trim());
+    await _addTodoUsecase(trimmed);
     await loadTodos();
   }
 
   Future<void> onToggleTodo(TodoEntity todoEntity) async {
-    await _updateTodoUsecase(todoEntity.copyWith(isDone: !todoEntity.isDone));
+    await _updateTodoUsecase(todoEntity.id, isDone: !todoEntity.isDone);
     await loadTodos();
   }
 
   Future<void> onDeleteTodo(TodoEntity todo) async {
-    await _deleteTodoUsecase(todo);
+    await _deleteTodoUsecase(todo.id);
     await loadTodos();
   }
 
@@ -60,16 +67,15 @@ class TodoBloc extends Cubit<TodoState> {
     TodoEntity todo,
     String? description,
   ) async {
-    if (description == null) {
-      await onDeleteTodo(todo);
+    if (description == null ||
+        description.trim().isEmpty ||
+        description.trim() == todo.description) {
       return;
     }
-    final trimmed = description.trim();
-    if (trimmed.isEmpty) {
-      await onDeleteTodo(todo);
-      return;
-    }
-    await _updateTodoUsecase(todo.copyWith(description: trimmed));
+    await _updateTodoUsecase(
+      todo.id,
+      description: description.trim(),
+    );
     await loadTodos();
   }
 }
