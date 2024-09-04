@@ -27,7 +27,9 @@ class AppWidget extends StatelessWidget {
             ),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: state.locale,
+            locale: AppLocalizations.supportedLocales.contains(state.locale)
+                ? state.locale
+                : null,
             home: const HomePage(
               title: 'Todo App',
             ),
