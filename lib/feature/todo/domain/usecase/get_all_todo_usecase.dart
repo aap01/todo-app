@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 
-import '../entity/todo_entity.dart';
+import '../entity/todo.dart';
 import '../repository/todo_repository.dart';
 
 @injectable
@@ -9,7 +9,7 @@ class GetAllTodoUsecase {
   GetAllTodoUsecase({required TodoRepository todoRepository})
       : _todoRepository = todoRepository;
 
-  Future<List<TodoEntity>> call() {
+  Future<List<Todo>> call() {
     return _todoRepository.getAll();
   }
 }

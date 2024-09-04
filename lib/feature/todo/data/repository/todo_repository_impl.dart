@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:todo_app/feature/todo/domain/entity/todo.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/repository/todo_repository.dart';
@@ -28,12 +28,12 @@ class TodoReositoryImpl implements TodoRepository {
 
   @override
   Future<void> add(String description) async {
-    final todo = TodoEntity.create(_uuid.v4(), description);
+    final todo = Todo.create(_uuid.v4(), description);
     await _localDataSource.create(TodoMapper.toHiveModel(todo));
   }
 
   @override
-  Future<List<TodoEntity>> getAll() async {
+  Future<List<Todo>> getAll() async {
     return (await _localDataSource.getAll())
         .map((e) => TodoMapper.fromHiveModel(e))
         .toList();
@@ -102,7 +102,7 @@ class TodoReositoryImpl implements TodoRepository {
     final localTodos = localModels.map(TodoMapper.fromHiveModel).toList();
 
     // 1. Accumulate todos from local store and remote database
-    final allTodos = <TodoEntity>{...localTodos, ...remoteTodos};
+    final allTodos = <Todo>{...localTodos, ...remoteTodos};
 
     // 2. Accumulate deletable todos
     final deletableTodos = allTodos.where((todo) => todo.isDeleted).toList();
@@ -118,8 +118,8 @@ class TodoReositoryImpl implements TodoRepository {
     }));
 
     // 3. Deal with conflicting todos
-    final latestLocalTodos = [];
-    final latestRemoteTodos = [];
+    final latestLocalTodos = <Todo>[];
+    final latestRemoteTodos = <Todo>[];
 
     for (var localTodo in localTodos) {
       remoteTodos
@@ -127,20 +127,22 @@ class TodoReositoryImpl implements TodoRepository {
         (todo) => todo.id == localTodo.id,
       )
           .forEach((remoteTodo) {
-        if (remoteTodo != null && localTodo != remoteTodo) {
-          if (localTodo.updatedAt.isAfter(remoteTodo.updatedAt)) {
-            latestLocalTodos.add(localTodo);
-          } else {
-            latestRemoteTodos.add(remoteTodo);
-          }
+        if (localTodo.updatedAt.isAfter(remoteTodo.updatedAt)) {
+          latestLocalTodos.add(localTodo);
+        } else {
+          latestRemoteTodos.add(remoteTodo);
         }
       });
     }
 
     // Parallelize updates
     await Future.wait([
-      ...latestLocalTodos.map((todo) => _remoteDataSource.update(todo)),
-      ...latestRemoteTodos.map((todo) => _localDataSource.update(todo)),
+      ...latestLocalTodos.map(
+        (todo) => _remoteDataSource.update(TodoMapper.toFirestoreModel(todo)),
+      ),
+      ...latestRemoteTodos.map(
+        (todo) => _localDataSource.update(TodoMapper.toHiveModel(todo)),
+      ),
     ]);
 
     // 4. Deal with non-conflicting todos

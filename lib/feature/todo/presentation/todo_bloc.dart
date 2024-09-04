@@ -2,7 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:todo_app/feature/todo/presentation/todo_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../domain/entity/todo_entity.dart';
+import '../domain/entity/todo.dart';
 import '../domain/usecase/add_todo_usecase.dart';
 import '../domain/usecase/delete_todo_usecase.dart';
 import '../domain/usecase/get_all_todo_usecase.dart';
@@ -57,18 +57,18 @@ class TodoBloc extends Cubit<TodoState> {
     await loadTodos();
   }
 
-  Future<void> onToggleTodo(TodoEntity todoEntity) async {
+  Future<void> onToggleTodo(Todo todoEntity) async {
     await _updateTodoUsecase(todoEntity.id, isDone: !todoEntity.isDone);
     await loadTodos();
   }
 
-  Future<void> onDeleteTodo(TodoEntity todo) async {
+  Future<void> onDeleteTodo(Todo todo) async {
     await _deleteTodoUsecase(todo.id);
     await loadTodos();
   }
 
   Future<void> onUpdateTodoDescription(
-    TodoEntity todo,
+    Todo todo,
     String? description,
   ) async {
     if (description == null ||

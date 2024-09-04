@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-import '../domain/entity/todo_entity.dart';
+import '../domain/entity/todo.dart';
 
 abstract class TodoState extends Equatable {
-  final List<TodoEntity> doneTodos;
-  final List<TodoEntity> incompleteTodos;
+  final List<Todo> doneTodos;
+  final List<Todo> incompleteTodos;
 
   const TodoState({
     required this.doneTodos,

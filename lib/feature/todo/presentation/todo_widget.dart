@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:todo_app/feature/todo/domain/entity/todo.dart';
 
 class TodoWidget extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final void Function(String?) onEdit;
-  final TodoEntity todoEntity;
+  final Todo todoEntity;
 
   const TodoWidget({
     super.key,

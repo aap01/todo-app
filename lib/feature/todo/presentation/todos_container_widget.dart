@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:todo_app/feature/todo/presentation/todo_widget.dart';
 
 import '../../../di/dependency.dart';
-import '../domain/entity/todo_entity.dart';
+import '../domain/entity/todo.dart';
 
 class TodosContainerWidget extends StatelessWidget {
   const TodosContainerWidget({
@@ -91,8 +91,8 @@ class TodosContainerWidget extends StatelessWidget {
 
 sealed class TodoListViewHolder {
   static List<TodoListViewHolder> getList(
-    List<TodoEntity> incompleteTodos,
-    List<TodoEntity> doneTodos,
+    List<Todo> incompleteTodos,
+    List<Todo> doneTodos,
   ) =>
       <TodoListViewHolder>[
         if (incompleteTodos.isNotEmpty) SectionGapHolder(),
@@ -109,6 +109,6 @@ class DoneSeparator extends TodoListViewHolder {}
 class SectionGapHolder extends TodoListViewHolder {}
 
 class TodoHolder extends TodoListViewHolder {
-  final TodoEntity todoEntity;
+  final Todo todoEntity;
   TodoHolder(this.todoEntity);
 }

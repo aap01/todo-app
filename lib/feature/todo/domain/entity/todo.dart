@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class TodoEntity extends Equatable {
+class Todo extends Equatable {
   final String id;
   final String description;
   final bool isDone;
@@ -9,7 +9,7 @@ class TodoEntity extends Equatable {
   final bool isDeleted;
   final DateTime doneStatusChangedAt;
 
-  const TodoEntity({
+  const Todo({
     required this.id,
     required this.description,
     required this.isDone,
@@ -19,9 +19,9 @@ class TodoEntity extends Equatable {
     required this.doneStatusChangedAt,
   });
 
-  factory TodoEntity.create(String id, String description) {
+  factory Todo.create(String id, String description) {
     final now = DateTime.now();
-    return TodoEntity(
+    return Todo(
       id: id,
       description: description,
       isDone: false,
@@ -43,7 +43,7 @@ class TodoEntity extends Equatable {
         doneStatusChangedAt,
       ];
 
-  TodoEntity updateDescription(String? description) {
+  Todo updateDescription(String? description) {
     if (description == null) {
       return this;
     }
@@ -57,7 +57,7 @@ class TodoEntity extends Equatable {
     );
   }
 
-  TodoEntity updateDone(bool? isDone) {
+  Todo updateDone(bool? isDone) {
     if (isDone == null) {
       return this;
     } else if (this.isDone == isDone) {
@@ -80,14 +80,14 @@ class TodoEntity extends Equatable {
     }
   }
 
-  TodoEntity delete() {
+  Todo delete() {
     return _copyWith(
       isDeleted: true,
       updatedAt: DateTime.now(),
     );
   }
 
-  TodoEntity _copyWith({
+  Todo _copyWith({
     String? id,
     String? description,
     bool? isDone,
@@ -96,7 +96,7 @@ class TodoEntity extends Equatable {
     bool? isDeleted,
     DateTime? doneStatusChangedAt,
   }) {
-    return TodoEntity(
+    return Todo(
       id: id ?? this.id,
       description: description ?? this.description,
       isDone: isDone ?? this.isDone,

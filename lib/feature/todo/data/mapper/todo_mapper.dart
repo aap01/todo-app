@@ -1,10 +1,10 @@
 import 'package:todo_app/feature/todo/data/model/todo_hive_model.dart';
-import 'package:todo_app/feature/todo/domain/entity/todo_entity.dart';
+import 'package:todo_app/feature/todo/domain/entity/todo.dart';
 
 import '../model/todo_firestore_model.dart';
 
 abstract final class TodoMapper {
-  static TodoHiveModel toHiveModel(TodoEntity todoEntity) => TodoHiveModel(
+  static TodoHiveModel toHiveModel(Todo todoEntity) => TodoHiveModel(
         id: todoEntity.id,
         description: todoEntity.description,
         isDone: todoEntity.isDone,
@@ -14,7 +14,7 @@ abstract final class TodoMapper {
         doneStatusChangedAt: todoEntity.doneStatusChangedAt,
       );
 
-  static TodoEntity fromHiveModel(TodoHiveModel todoHiveModel) => TodoEntity(
+  static Todo fromHiveModel(TodoHiveModel todoHiveModel) => Todo(
         id: todoHiveModel.id,
         description: todoHiveModel.description,
         isDone: todoHiveModel.isDone,
@@ -23,8 +23,7 @@ abstract final class TodoMapper {
         isDeleted: todoHiveModel.isDeleted,
         doneStatusChangedAt: todoHiveModel.doneStatusChangedAt,
       );
-  static TodoEntity fromFirestoreModel(TodoFirestoreModel todoFirestoreModel) =>
-      TodoEntity(
+  static Todo fromFirestoreModel(TodoFirestoreModel todoFirestoreModel) => Todo(
         id: todoFirestoreModel.id,
         description: todoFirestoreModel.description,
         isDone: todoFirestoreModel.isDone,
@@ -34,7 +33,7 @@ abstract final class TodoMapper {
         doneStatusChangedAt: todoFirestoreModel.doneStatusChangedAt,
       );
 
-  static TodoFirestoreModel toFirestoreModel(TodoEntity todoEntity) =>
+  static TodoFirestoreModel toFirestoreModel(Todo todoEntity) =>
       TodoFirestoreModel(
         id: todoEntity.id,
         description: todoEntity.description,
