@@ -24,8 +24,7 @@ class LocaleBloc extends Cubit<LocaleState> {
   }
 
   Future<void> updateLocale(Locale locale) async {
-    final userSettings = await _getUserSettings();
-    await _updateUserSettings(userSettings.copyWith(locale: locale));
+    await _updateUserSettings(locale: locale);
     emit(LocaleState(locale: locale));
   }
 }

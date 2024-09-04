@@ -24,9 +24,18 @@ import '../feature/todo/domain/usecase/delete_todo_usecase.dart' as _i306;
 import '../feature/todo/domain/usecase/get_all_todo_usecase.dart' as _i422;
 import '../feature/todo/domain/usecase/update_todo_usecase.dart' as _i489;
 import '../feature/todo/presentation/todo_bloc.dart' as _i896;
+import '../feature/user_settings/data/datasource/user_settings_local_datasource.dart'
+    as _i228;
+import '../feature/user_settings/data/datasource/user_settings_local_datasource_impl.dart'
+    as _i147;
+import '../feature/user_settings/data/datasource/user_settings_remote_datasource.dart'
+    as _i273;
+import '../feature/user_settings/data/datasource/user_settings_remote_datasource_impl.dart'
+    as _i463;
 import '../feature/user_settings/data/di/user_settings_hive_module.dart'
     as _i1027;
-import '../feature/user_settings/data/model/user_settings_model.dart' as _i216;
+import '../feature/user_settings/data/model/user_settings_hive_model.dart'
+    as _i537;
 import '../feature/user_settings/data/repository/user_settings_repository_impl.dart'
     as _i740;
 import '../feature/user_settings/domain/repository/user_settings_repository.dart'
@@ -50,31 +59,30 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final todoHiveModule = _$TodoHiveModule();
-    final userSettginsHiveModule = _$UserSettginsHiveModule();
     final todoFirestoreModule = _$TodoFirestoreModule();
+    final userSettginsHiveModule = _$UserSettginsHiveModule();
     final sharedModule = _$SharedModule();
     await gh.factoryAsync<_i979.Box<_i345.TodoHiveModel>>(
       () => todoHiveModule.provideTodoBox(),
       preResolve: true,
     );
-    await gh.factoryAsync<_i979.Box<_i216.UserSettingsModel>>(
+    gh.factory<_i974.FirebaseFirestore>(() => todoFirestoreModule.firestore);
+    await gh.factoryAsync<_i979.Box<_i537.UserSettingsHiveModel>>(
       () => userSettginsHiveModule.provideUserSettingsBox(),
       preResolve: true,
     );
-    gh.factory<_i974.FirebaseFirestore>(() => todoFirestoreModule.firestore);
     gh.singleton<_i706.Uuid>(() => sharedModule.provideUuid());
     gh.factory<_i953.TodoRepository>(() => _i491.TodoReositoryImpl(
           todoBox: gh<_i979.Box<_i345.TodoHiveModel>>(),
           uuid: gh<_i706.Uuid>(),
           firestore: gh<_i974.FirebaseFirestore>(),
         ));
-    gh.factory<_i293.UserSettingsRepository>(() =>
-        _i740.UserSettingsRepositoryImpl(
-            box: gh<_i979.Box<_i216.UserSettingsModel>>()));
-    gh.factory<_i943.GetUserSettings>(() =>
-        _i943.GetUserSettings(repository: gh<_i293.UserSettingsRepository>()));
-    gh.factory<_i831.UpdateUserSettings>(() => _i831.UpdateUserSettings(
-        repository: gh<_i293.UserSettingsRepository>()));
+    gh.factory<_i228.UserSettingsLocalDataSource>(() =>
+        _i147.UserSettingsLocalDatasourceImpl(
+            box: gh<_i979.Box<_i537.UserSettingsHiveModel>>()));
+    gh.factory<_i273.UserSettingsRemoteDataSource>(() =>
+        _i463.UserSettingsRemoteDatasourceImpl(
+            firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i306.DeleteTodoUsecase>(() =>
         _i306.DeleteTodoUsecase(todoRepository: gh<_i953.TodoRepository>()));
     gh.factory<_i273.AddTodoUsecase>(
@@ -89,6 +97,15 @@ extension GetItInjectableX on _i174.GetIt {
           updateTodoDescriptionUsecase: gh<_i489.UpdateTodoUsecase>(),
           getAllTodoUsecase: gh<_i422.GetAllTodoUsecase>(),
         ));
+    gh.factory<_i293.UserSettingsRepository>(
+        () => _i740.UserSettingsRepositoryImpl(
+              localDataSource: gh<_i228.UserSettingsLocalDataSource>(),
+              remoteDataSource: gh<_i273.UserSettingsRemoteDataSource>(),
+            ));
+    gh.factory<_i943.GetUserSettings>(() =>
+        _i943.GetUserSettings(repository: gh<_i293.UserSettingsRepository>()));
+    gh.factory<_i831.UpdateUserSettings>(() => _i831.UpdateUserSettings(
+        repository: gh<_i293.UserSettingsRepository>()));
     gh.factory<_i237.LocaleBloc>(() => _i237.LocaleBloc(
           getUserSettings: gh<_i943.GetUserSettings>(),
           updateUserSettings: gh<_i831.UpdateUserSettings>(),
@@ -99,8 +116,8 @@ extension GetItInjectableX on _i174.GetIt {
 
 class _$TodoHiveModule extends _i657.TodoHiveModule {}
 
-class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
-
 class _$TodoFirestoreModule extends _i376.TodoFirestoreModule {}
+
+class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
 
 class _$SharedModule extends _i521.SharedModule {}
