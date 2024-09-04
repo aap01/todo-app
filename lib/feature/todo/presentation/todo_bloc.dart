@@ -29,16 +29,14 @@ class TodoBloc extends Cubit<TodoState> {
   Future<void> loadTodos() async {
     final todos = await _getAllTodoUsecase();
 
+    final activeTodos = todos.where((e) => !e.isDeleted);
+
     // item created later shows up last
-    final incompleteTodos = todos
-        .where((todo) => !todo.isDone && !todo.isDeleted)
-        .toList()
+    final incompleteTodos = activeTodos.where((todo) => !todo.isDone).toList()
       ..sort((a, b) => a.createdAt.isBefore(b.createdAt) ? -1 : 1);
 
     // item done later shows up first
-    final doneTodos = todos
-        .where((todo) => todo.isDone && !todo.isDeleted)
-        .toList()
+    final doneTodos = activeTodos.where((todo) => todo.isDone).toList()
       ..sort((a, b) =>
           a.doneStatusChangedAt.isBefore(b.doneStatusChangedAt) ? 1 : -1);
     emit(
