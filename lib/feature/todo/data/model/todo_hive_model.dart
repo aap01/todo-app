@@ -3,7 +3,6 @@ part 'todo_hive_model.g.dart';
 
 @HiveType(typeId: 0)
 class TodoHiveModel {
-  static String get boxName => 'todo';
   @HiveField(0)
   final String id;
   @HiveField(1)

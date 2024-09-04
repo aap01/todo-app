@@ -1,7 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:todo_app/feature/todo/data/model/todo_hive_model.dart';
-
-import '../../data/model/todo_firestore_model.dart';
 
 class TodoEntity extends Equatable {
   final String id;
@@ -12,7 +9,7 @@ class TodoEntity extends Equatable {
   final bool isDeleted;
   final DateTime doneStatusChangedAt;
 
-  const TodoEntity._({
+  const TodoEntity({
     required this.id,
     required this.description,
     required this.isDone,
@@ -24,7 +21,7 @@ class TodoEntity extends Equatable {
 
   factory TodoEntity.create(String id, String description) {
     final now = DateTime.now();
-    return TodoEntity._(
+    return TodoEntity(
       id: id,
       description: description,
       isDone: false,
@@ -99,7 +96,7 @@ class TodoEntity extends Equatable {
     bool? isDeleted,
     DateTime? doneStatusChangedAt,
   }) {
-    return TodoEntity._(
+    return TodoEntity(
       id: id ?? this.id,
       description: description ?? this.description,
       isDone: isDone ?? this.isDone,
@@ -109,46 +106,4 @@ class TodoEntity extends Equatable {
       doneStatusChangedAt: doneStatusChangedAt ?? this.doneStatusChangedAt,
     );
   }
-
-  factory TodoEntity.fromFirestoreModel(
-          TodoFirestoreModel todoFirestoreModel) =>
-      TodoEntity._(
-        id: todoFirestoreModel.id,
-        description: todoFirestoreModel.description,
-        isDone: todoFirestoreModel.isDone,
-        createdAt: todoFirestoreModel.createdAt,
-        updatedAt: todoFirestoreModel.updatedAt,
-        isDeleted: todoFirestoreModel.isDeleted,
-        doneStatusChangedAt: todoFirestoreModel.doneStatusChangedAt,
-      );
-
-  factory TodoEntity.fromHiveModel(TodoHiveModel todoHiveModel) => TodoEntity._(
-        id: todoHiveModel.id,
-        description: todoHiveModel.description,
-        isDone: todoHiveModel.isDone,
-        createdAt: todoHiveModel.createdAt,
-        updatedAt: todoHiveModel.updatedAt,
-        isDeleted: todoHiveModel.isDeleted,
-        doneStatusChangedAt: todoHiveModel.doneStatusChangedAt,
-      );
-
-  TodoFirestoreModel toFirestoreModel() => TodoFirestoreModel(
-        id: id,
-        description: description,
-        isDone: isDone,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        isDeleted: isDeleted,
-        doneStatusChangedAt: doneStatusChangedAt,
-      );
-
-  TodoHiveModel toHiveModel() => TodoHiveModel(
-        id: id,
-        description: description,
-        isDone: isDone,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        isDeleted: isDeleted,
-        doneStatusChangedAt: doneStatusChangedAt,
-      );
 }

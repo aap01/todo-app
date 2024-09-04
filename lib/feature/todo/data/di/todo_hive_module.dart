@@ -8,6 +8,6 @@ abstract class TodoHiveModule {
   @preResolve
   Future<Box<TodoHiveModel>> provideTodoBox() async {
     Hive.registerAdapter(TodoHiveModelAdapter());
-    return Hive.openBox<TodoHiveModel>(TodoHiveModel.boxName);
+    return Hive.openBox<TodoHiveModel>('todo');
   }
 }
