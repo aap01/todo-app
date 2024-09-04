@@ -5,4 +5,9 @@ abstract class TodoRemoteDataSource {
   Future<void> update(TodoFirestoreModel model);
   Future<void> delete(String id);
   Future<List<TodoFirestoreModel>> getAll();
+  Future<void> sync({
+    required List<String> deleteModelIds,
+    required List<TodoFirestoreModel> updateModels,
+    required List<TodoFirestoreModel> createModels,
+  });
 }

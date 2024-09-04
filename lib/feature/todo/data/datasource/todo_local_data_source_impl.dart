@@ -17,7 +17,7 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   }
 
   @override
-  Future<List<TodoHiveModel>> getAll() => Future.value(_box.values.toList());
+  Future<List<TodoHiveModel>> getAll() async => _box.values.toList();
 
   @override
   Future<void> update(TodoHiveModel model) => _box.put(model.id, model);
@@ -26,5 +26,18 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
   Future<void> create(TodoHiveModel model) => _box.put(model.id, model);
 
   @override
-  Future<TodoHiveModel?> get(String id) => Future.value(_box.get(id));
+  Future<TodoHiveModel?> get(String id) async => _box.get(id);
+
+  @override
+  Future<void> sync({
+    required List<String> deleteModelIds,
+    required List<TodoHiveModel> updateModels,
+    required List<TodoHiveModel> createModels,
+  }) async {
+    await Future.wait([
+      _box.deleteAll(deleteModelIds),
+      _box.putAll(Map.fromEntries(updateModels.map((e) => MapEntry(e.id, e)))),
+      _box.putAll(Map.fromEntries(createModels.map((e) => MapEntry(e.id, e)))),
+    ]);
+  }
 }

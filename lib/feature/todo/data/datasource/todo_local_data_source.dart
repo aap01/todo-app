@@ -6,4 +6,9 @@ abstract interface class TodoLocalDataSource {
   Future<void> delete(String id);
   Future<List<TodoHiveModel>> getAll();
   Future<TodoHiveModel?> get(String id);
+  Future<void> sync({
+    required List<String> deleteModelIds,
+    required List<TodoHiveModel> updateModels,
+    required List<TodoHiveModel> createModels,
+  });
 }

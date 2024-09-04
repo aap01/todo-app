@@ -35,7 +35,7 @@ class TodoReositoryImpl implements TodoRepository {
   @override
   Future<List<Todo>> getAll() async {
     return (await _localDataSource.getAll())
-        .map((e) => TodoMapper.fromHiveModel(e))
+        .map(TodoMapper.fromHiveModel)
         .toList();
   }
 
@@ -91,7 +91,6 @@ class TodoReositoryImpl implements TodoRepository {
         _remoteDataSource.getAll();
     final Future<List<TodoHiveModel>> localTodosFuture =
         _localDataSource.getAll();
-
     final (remoteModels, localModels) = await (
       remoteTodosFuture,
       localTodosFuture,
@@ -101,66 +100,100 @@ class TodoReositoryImpl implements TodoRepository {
         remoteModels.map(TodoMapper.fromFirestoreModel).toList();
     final localTodos = localModels.map(TodoMapper.fromHiveModel).toList();
 
-    // 1. Accumulate todos from local store and remote database
-    final allTodos = <Todo>{...localTodos, ...remoteTodos};
-
     // 2. Accumulate deletable todos
-    final deletableTodos = allTodos.where((todo) => todo.isDeleted).toList();
+    final remoteTodoMap = {for (var todo in remoteTodos) todo.id: todo};
+    final localTodoMap = {for (var todo in localTodos) todo.id: todo};
 
-    // Parallelize deletions
-    await Future.wait(deletableTodos.map((todo) async {
-      if (remoteTodos.contains(todo)) {
-        await _remoteDataSource.delete(todo.id);
-      }
-      if (localTodos.contains(todo)) {
-        await _localDataSource.delete(todo.id);
-      }
-    }));
+    // a. deletableLocalTodos
+    //    - todos that are marked with isDeleted to true in localTodosList
+    //    - todos that are not marked with isDeleted to true in localTodosList
+    //      but with same id marked isDeleted in remoteTodoList
+    final deletableLocalTodos = localTodos
+        .where((localTodo) {
+          return localTodo.isDeleted ||
+              (remoteTodoMap.containsKey(localTodo.id) &&
+                  remoteTodoMap[localTodo.id]!.isDeleted);
+        })
+        .map((e) => e.id)
+        .toList();
+
+    // b. deletableRemoteTodos
+    //    - todos that are marked with isDeleted to true in remoteTodosList
+    //    - todos that are not marked with isDeleted to true in remoteTodosList
+    //      but with same id marked isDeleted in localTodoList
+    final deletableRemoteTodos = remoteTodos
+        .where((remoteTodo) {
+          return remoteTodo.isDeleted ||
+              (localTodoMap.containsKey(remoteTodo.id) &&
+                  localTodoMap[remoteTodo.id]!.isDeleted);
+        })
+        .map((e) => e.id)
+        .toList();
 
     // 3. Deal with conflicting todos
-    final latestLocalTodos = <Todo>[];
-    final latestRemoteTodos = <Todo>[];
+    // a. latestLocalTodos to send to remote
+    final latestLocalTodos = localTodos
+        .where((localTodo) {
+          final remoteTodo = remoteTodoMap[localTodo.id];
+          if (remoteTodo == null) {
+            return false;
+          }
+          return !localTodo.isDeleted &&
+              !remoteTodo.isDeleted &&
+              localTodo != remoteTodo &&
+              localTodo.updatedAt.isAfter(remoteTodo.updatedAt);
+        })
+        .map(TodoMapper.toFirestoreModel)
+        .toList();
 
-    for (var localTodo in localTodos) {
-      remoteTodos
-          .where(
-        (todo) => todo.id == localTodo.id,
-      )
-          .forEach((remoteTodo) {
-        if (localTodo.updatedAt.isAfter(remoteTodo.updatedAt)) {
-          latestLocalTodos.add(localTodo);
-        } else {
-          latestRemoteTodos.add(remoteTodo);
-        }
-      });
-    }
-
-    // Parallelize updates
-    await Future.wait([
-      ...latestLocalTodos.map(
-        (todo) => _remoteDataSource.update(TodoMapper.toFirestoreModel(todo)),
-      ),
-      ...latestRemoteTodos.map(
-        (todo) => _localDataSource.update(TodoMapper.toHiveModel(todo)),
-      ),
-    ]);
+    // a. latestRemoteTodos to put in local
+    final latestRemoteTodos = remoteTodos
+        .where((remoteTodo) {
+          final localTodo = localTodoMap[remoteTodo.id];
+          return !remoteTodo.isDeleted &&
+              localTodo != null &&
+              !localTodo.isDeleted &&
+              remoteTodo != localTodo &&
+              remoteTodo.updatedAt.isAfter(localTodo.updatedAt);
+        })
+        .map(TodoMapper.toHiveModel)
+        .toList();
 
     // 4. Deal with non-conflicting todos
     final nonConflictingLocalTodos = localTodos
-        .where((localTodo) =>
-            !remoteTodos.any((remoteTodo) => remoteTodo.id == localTodo.id))
-        .toList();
-    final nonConflictingRemoteTodos = remoteTodos
-        .where((remoteTodo) =>
-            !localTodos.any((localTodo) => localTodo.id == remoteTodo.id))
+        .where((localTodo) {
+          return !remoteTodoMap.containsKey(localTodo.id) &&
+              !localTodo.isDeleted;
+        })
+        .map(TodoMapper.toFirestoreModel)
         .toList();
 
-    // Parallelize creations
+    final nonConflictingRemoteTodos = remoteTodos
+        .where((remoteTodo) {
+          return !localTodoMap.containsKey(remoteTodo.id) &&
+              !remoteTodo.isDeleted;
+        })
+        .map(TodoMapper.toHiveModel)
+        .toList();
+
+    // Sync
+    debugPrint('deleletableRemoteTodos: $deletableRemoteTodos');
+    debugPrint('latestLocalTodos: $latestLocalTodos');
+    debugPrint('nonConflictingLocalTodos: $nonConflictingLocalTodos');
+    debugPrint('deletableLocalTodos: $deletableLocalTodos');
+    debugPrint('latestRemoteTodos: $latestRemoteTodos');
+    debugPrint('nonConflictingRemoteTodos: $nonConflictingRemoteTodos');
     await Future.wait([
-      ...nonConflictingLocalTodos.map(
-          (todo) => _remoteDataSource.save(TodoMapper.toFirestoreModel(todo))),
-      ...nonConflictingRemoteTodos
-          .map((todo) => _localDataSource.create(TodoMapper.toHiveModel(todo))),
+      _remoteDataSource.sync(
+        deleteModelIds: deletableRemoteTodos,
+        updateModels: latestLocalTodos,
+        createModels: nonConflictingLocalTodos,
+      ),
+      _localDataSource.sync(
+        deleteModelIds: deletableLocalTodos,
+        updateModels: latestRemoteTodos,
+        createModels: nonConflictingRemoteTodos,
+      ),
     ]);
   }
 }
