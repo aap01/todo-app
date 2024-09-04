@@ -29,6 +29,13 @@ dependencies:
   cloud_firestore: ^4.14.0
   json_annotation: ^4.9.0
 
+  # latest workmanager release does not work on ios, so pointing to a commit that works
+  # https://github.com/fluttercommunity/flutter_workmanager/issues/551#issuecomment-2114292471
+  workmanager:
+    git:
+      url: https://github.com/fluttercommunity/flutter_workmanager.git
+      ref: b783000
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
