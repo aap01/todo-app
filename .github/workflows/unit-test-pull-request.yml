@@ -31,26 +31,3 @@ jobs:
 
       - name: Run unit tests
         run: flutter test --coverage
-
-      - name: Install coverage-badge
-        run: |
-          pip install coverage-badge
-
-      - name: Generate coverage badge
-        run: |
-          cd coverage && coverage-badge -o coverage.svg && cd ..
-          mv coverage/coverage.svg coverage.svg
-
-      - name: Update README with new coverage badge
-        run: |
-          sed -i '' 's|!\[Coverage\](.*)|![Coverage](./coverage-badge.svg)|' README.md
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add README.md coverage-badge.svg
-          git commit -m 'Update code coverage badge'
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
