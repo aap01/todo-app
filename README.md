@@ -1,4 +1,5 @@
 # Todo Application
+[![Tests](https://github.com/aap01/todo-app/actions/workflows/unit-test-pull-request.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/unit-test-pull-request.yml)
 
 Organize and access your todos from anywhere, anytime
 See the live web application:
