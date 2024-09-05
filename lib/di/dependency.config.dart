@@ -64,10 +64,12 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
-    final todoHiveModule = _$TodoHiveModule();
-    final userSettginsHiveModule = _$UserSettginsHiveModule();
     final uuidModule = _$UuidModule();
     final firestoreModule = _$FirestoreModule();
+    final todoHiveModule = _$TodoHiveModule();
+    final userSettginsHiveModule = _$UserSettginsHiveModule();
+    gh.factory<_i706.Uuid>(() => uuidModule.provideUuid());
+    gh.factory<_i974.FirebaseFirestore>(() => firestoreModule.firestore);
     await gh.factoryAsync<_i979.Box<_i345.TodoHiveModel>>(
       () => todoHiveModule.provideTodoBox(),
       preResolve: true,
@@ -76,8 +78,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => userSettginsHiveModule.provideUserSettingsBox(),
       preResolve: true,
     );
-    gh.factory<_i706.Uuid>(() => uuidModule.provideUuid());
-    gh.factory<_i974.FirebaseFirestore>(() => firestoreModule.firestore);
     gh.factory<_i494.TodoLocalDataSource>(() => _i1027.TodoLocalDataSourceImpl(
         box: gh<_i979.Box<_i345.TodoHiveModel>>()));
     gh.factory<_i228.UserSettingsLocalDataSource>(() =>
@@ -124,10 +124,10 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
-class _$TodoHiveModule extends _i657.TodoHiveModule {}
-
-class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
-
 class _$UuidModule extends _i78.UuidModule {}
 
 class _$FirestoreModule extends _i431.FirestoreModule {}
+
+class _$TodoHiveModule extends _i657.TodoHiveModule {}
+
+class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}

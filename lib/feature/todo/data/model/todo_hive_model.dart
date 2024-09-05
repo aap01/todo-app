@@ -27,4 +27,24 @@ class TodoHiveModel {
     required this.isDeleted,
     required this.doneStatusChangedAt,
   });
+
+  TodoHiveModel copyWith({
+    String? id,
+    String? description,
+    bool? isDone,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isDeleted,
+    DateTime? doneStatusChangedAt,
+  }) {
+    return TodoHiveModel(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      isDone: isDone ?? this.isDone,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      doneStatusChangedAt: doneStatusChangedAt ?? this.doneStatusChangedAt,
+    );
+  }
 }
