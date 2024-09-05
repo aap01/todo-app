@@ -1,6 +1,6 @@
 # this job runs on pull request to main branch
 # it runs all the unit tests for the flutter project
-# it uploads test coverage reports
+# it updates the codecov badge in readme and commits
 
 name: Run Unit Tests
 
@@ -32,10 +32,25 @@ jobs:
       - name: Run unit tests
         run: flutter test --coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: true
+      - name: Install coverage-badge
+        run: |
+          pip install coverage-badge
+
+      - name: Generate coverage badge
+        run: |
+          cd coverage && coverage-badge -o coverage.svg && cd ..
+          mv coverage/coverage.svg coverage.svg
+
+      - name: Update README with new coverage badge
+        run: |
+          sed -i '' 's|!\[Coverage\](.*)|![Coverage](./coverage-badge.svg)|' README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md coverage-badge.svg
+          git commit -m 'Update code coverage badge'
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
