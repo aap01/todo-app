@@ -1,4 +1,5 @@
 {
   "completed": "Completed",
-  "addTodoHintText": "New"
+  "addTodoHintText": "New",
+  "language": "Language"
 }

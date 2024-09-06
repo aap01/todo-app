@@ -47,6 +47,9 @@ class TodoWidget extends StatelessWidget {
               textInputAction: TextInputAction.done,
               keyboardType: TextInputType.multiline,
               maxLines: null,
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
