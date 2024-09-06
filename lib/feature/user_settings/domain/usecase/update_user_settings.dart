@@ -11,6 +11,5 @@ class UpdateUserSettings {
     required UserSettingsRepository repository,
   }) : _repository = repository;
 
-  Future<void> call({Locale? locale }) =>
-      _repository.save(locale: locale);
+  Future<void> call({Locale? locale}) => _repository.save(locale: locale);
 }

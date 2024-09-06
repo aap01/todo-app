@@ -1,5 +1,7 @@
 # Todo Application
-[![Tests](https://github.com/aap01/todo-app/actions/workflows/unit-test-pull-request.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/unit-test-pull-request.yml)
+[![Deploy Web](https://github.com/aap01/todo-app/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/firebase-hosting-merge.yml)
+
+[![Format Analyze Test](https://github.com/aap01/todo-app/actions/workflows/format-analyze-test.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/format-analyze-test.yml)
 
 Organize and access your todos from anywhere, anytime
 See the live web application:

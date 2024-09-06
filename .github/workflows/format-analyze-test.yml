@@ -1,21 +1,16 @@
-# this job runs on pull request to main branch
-# it runs all the unit tests for the flutter project
-# it updates the codecov badge in readme and commits
-
-name: Run Unit Tests
-
+name: Format Analyze Test
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
-  test:
+  format-analyze-test:
+    name: Test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: 🐦 Setup Flutter
@@ -28,6 +23,14 @@ jobs:
         run: |
           flutter pub get
           flutter gen-l10n
+
+        # Check for any formatting issues in the code.
+      - name: Format
+        run: dart format --set-exit-if-changed .
+
+      # Statically analyze the Dart code for any errors.
+      - name: analyze
+        run: dart analyze .
 
       - name: Run unit tests
         run: flutter test --coverage
