@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:todo_app/application/app_widget.dart';
 import 'package:todo_app/application/service/sync_service.dart';
@@ -31,10 +32,8 @@ void callbackDispatcher() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  if (kIsWeb) {
-    Hive.init(null);
-  } else {
-    Hive.init((await getApplicationDocumentsDirectory()).path);
+  await Hive.initFlutter();
+  if (!kIsWeb) {
     Workmanager().initialize(
       callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode:

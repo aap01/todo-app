@@ -1,8 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../di/dependency.dart';
 import '../../firebase_options.dart';
@@ -14,7 +13,8 @@ class SyncService {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    Hive.init((await getApplicationDocumentsDirectory()).path);
+    // initialize hive first
+    await Hive.initFlutter();
     await configureDependencies();
     for (final sync in param0(getIt)) {
       try {
