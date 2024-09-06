@@ -25,3 +25,10 @@ See the live web application:
 
 ## Caution
 - Testing background services on IOS is one messy job :/
+
+
+## Run
+```bash
+flutter gen-l10n # Generate localization files
+flutter run # For Chrome
+```
