@@ -18,7 +18,9 @@ class TodosContainerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<TodoBloc>()..loadTodos(),
+      create: (context) => getIt<TodoBloc>()
+        ..listenToBackgroundTask()
+        ..loadTodos(),
       child: Builder(builder: (context) {
         final todoBloc = context.read<TodoBloc>();
         return Column(

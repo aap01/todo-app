@@ -1,7 +1,12 @@
+import 'dart:isolate';
+import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:todo_app/feature/todo/presentation/todo_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/service/service_port_names.dart';
 import '../domain/entity/todo.dart';
 import '../domain/usecase/add_todo_usecase.dart';
 import '../domain/usecase/delete_todo_usecase.dart';
@@ -14,17 +19,43 @@ class TodoBloc extends Cubit<TodoState> {
   final DeleteTodoUsecase _deleteTodoUsecase;
   final UpdateTodoUsecase _updateTodoUsecase;
   final GetAllTodoUsecase _getAllTodoUsecase;
+  final ReceivePort _receivePort;
 
+  @factoryMethod
   TodoBloc({
     required AddTodoUsecase addTodoUsecase,
     required DeleteTodoUsecase deleteTodoUsecase,
     required UpdateTodoUsecase updateTodoDescriptionUsecase,
     required GetAllTodoUsecase getAllTodoUsecase,
-  })  : _addTodoUsecase = addTodoUsecase,
+    @Named(ServicePortNames.todo) required ReceivePort receivePort,
+  })  : _receivePort = receivePort,
+        _addTodoUsecase = addTodoUsecase,
         _deleteTodoUsecase = deleteTodoUsecase,
         _updateTodoUsecase = updateTodoDescriptionUsecase,
         _getAllTodoUsecase = getAllTodoUsecase,
         super(TodoInitialState());
+
+  void listenToBackgroundTask() {
+    // TODO: separate into multiple classes TodoWebBloc, TodoMobileBloc
+    if (kIsWeb) {
+      return;
+    } else {
+      final isSuccess = IsolateNameServer.registerPortWithName(
+          _receivePort.sendPort, ServicePortNames.todo);
+      if (isSuccess) {
+        debugPrint('ready to receive data from background for ${runtimeType}');
+        _receivePort.listen((data) {
+          if (data == true) loadTodos();
+        });
+      } else {
+        IsolateNameServer.removePortNameMapping(ServicePortNames.todo)
+            ? debugPrint('removed port')
+            : debugPrint('port not removed');
+        listenToBackgroundTask();
+        debugPrint('failed to register port');
+      }
+    }
+  }
 
   Future<void> loadTodos() async {
     final todos = await _getAllTodoUsecase();
