@@ -14,7 +14,9 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<LocaleBloc>()..loadLocale(),
+      create: (_) => getIt<LocaleBloc>()
+        ..listenToBackgroundTask()
+        ..loadLocale(),
       child: BlocBuilder<LocaleBloc, LocaleState>(
         builder: (context, state) {
           return MaterialApp(

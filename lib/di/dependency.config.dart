@@ -8,6 +8,8 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:isolate' as _i709;
+
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:hive/hive.dart' as _i979;
@@ -21,6 +23,7 @@ import '../feature/todo/data/datasource/todo_remote_data_source.dart' as _i47;
 import '../feature/todo/data/datasource/todo_remote_data_source_impl.dart'
     as _i592;
 import '../feature/todo/data/di/todo_hive_module.dart' as _i657;
+import '../feature/todo/data/di/todo_service_module.dart' as _i816;
 import '../feature/todo/data/model/todo_hive_model.dart' as _i345;
 import '../feature/todo/data/repository/todo_repository_impl.dart' as _i491;
 import '../feature/todo/domain/repository/todo_repository.dart' as _i953;
@@ -39,6 +42,8 @@ import '../feature/user_settings/data/datasource/user_settings_remote_datasource
     as _i463;
 import '../feature/user_settings/data/di/user_settings_hive_module.dart'
     as _i1027;
+import '../feature/user_settings/data/di/user_settings_service_module.dart'
+    as _i386;
 import '../feature/user_settings/data/model/user_settings_hive_model.dart'
     as _i537;
 import '../feature/user_settings/data/repository/user_settings_repository_impl.dart'
@@ -68,6 +73,8 @@ extension GetItInjectableX on _i174.GetIt {
     final firestoreModule = _$FirestoreModule();
     final todoHiveModule = _$TodoHiveModule();
     final userSettginsHiveModule = _$UserSettginsHiveModule();
+    final todoServiceModule = _$TodoServiceModule();
+    final userSettingsServiceModule = _$UserSettingsServiceModule();
     gh.factory<_i706.Uuid>(() => uuidModule.provideUuid());
     gh.factory<_i974.FirebaseFirestore>(() => firestoreModule.firestore);
     await gh.factoryAsync<_i979.Box<_i345.TodoHiveModel>>(
@@ -80,9 +87,17 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i494.TodoLocalDataSource>(() => _i1027.TodoLocalDataSourceImpl(
         box: gh<_i979.Box<_i345.TodoHiveModel>>()));
+    gh.lazySingleton<_i709.ReceivePort>(
+      () => todoServiceModule.getTodoServicePort(),
+      instanceName: 'todo',
+    );
     gh.factory<_i228.UserSettingsLocalDataSource>(() =>
         _i147.UserSettingsLocalDatasourceImpl(
             box: gh<_i979.Box<_i537.UserSettingsHiveModel>>()));
+    gh.lazySingleton<_i709.ReceivePort>(
+      () => userSettingsServiceModule.getUserSettingsServicePort(),
+      instanceName: 'userSettings',
+    );
     gh.factory<_i47.TodoRemoteDataSource>(() => _i592.TodoRemoteDatasourceImpl(
         firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i953.TodoRepository>(() => _i491.TodoReositoryImpl(
@@ -106,6 +121,7 @@ extension GetItInjectableX on _i174.GetIt {
           deleteTodoUsecase: gh<_i306.DeleteTodoUsecase>(),
           updateTodoDescriptionUsecase: gh<_i489.UpdateTodoUsecase>(),
           getAllTodoUsecase: gh<_i422.GetAllTodoUsecase>(),
+          receivePort: gh<_i709.ReceivePort>(instanceName: 'todo'),
         ));
     gh.factory<_i293.UserSettingsRepository>(
         () => _i740.UserSettingsRepositoryImpl(
@@ -119,6 +135,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i237.LocaleBloc>(() => _i237.LocaleBloc(
           getUserSettings: gh<_i943.GetUserSettings>(),
           updateUserSettings: gh<_i831.UpdateUserSettings>(),
+          receivePort: gh<_i709.ReceivePort>(instanceName: 'userSettings'),
         ));
     return this;
   }
@@ -131,3 +148,7 @@ class _$FirestoreModule extends _i431.FirestoreModule {}
 class _$TodoHiveModule extends _i657.TodoHiveModule {}
 
 class _$UserSettginsHiveModule extends _i1027.UserSettginsHiveModule {}
+
+class _$TodoServiceModule extends _i816.TodoServiceModule {}
+
+class _$UserSettingsServiceModule extends _i386.UserSettingsServiceModule {}
