@@ -14,6 +14,7 @@ class LocaleToggleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToggleSwitch(
+      animate: true,
       initialLabelIndex: locale == const Locale('en') ? 0 : 1,
       labels: const ['EN', 'عربى'],
       onToggle: (index) {

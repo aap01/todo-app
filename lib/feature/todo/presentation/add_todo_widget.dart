@@ -16,23 +16,40 @@ class _AddTodoWidgetState extends State<AddTodoWidget> {
   final _textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.multiline,
-      maxLines: null,
-      controller: _textController,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        prefixIcon: Icon(
-          Icons.add,
-          color: Theme.of(context).colorScheme.primary,
+    return Card(
+      elevation: 2.0,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextField(
+          textInputAction: TextInputAction.done,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          controller: _textController,
+          onTapOutside: (event) {
+            FocusScope.of(context).unfocus();
+          },
+          decoration: InputDecoration(
+            // border: ,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            border: const OutlineInputBorder(
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            hintText: AppLocalizations.of(context)!.addTodoHintText,
+          ),
+          onSubmitted: (value) {
+            widget.onAdd(value);
+            _textController.clear();
+          },
         ),
-        hintText: AppLocalizations.of(context)!.addTodoHintText,
       ),
-      onSubmitted: (value) {
-        widget.onAdd(value);
-        _textController.clear();
-      },
     );
   }
 

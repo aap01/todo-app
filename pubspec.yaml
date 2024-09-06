@@ -36,6 +36,7 @@ dependencies:
       url: https://github.com/fluttercommunity/flutter_workmanager.git
       ref: b783000
   hive_flutter: ^1.1.0
+  responsive_builder: ^0.7.1
 
 dev_dependencies:
   flutter_test:
