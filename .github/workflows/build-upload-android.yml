@@ -1,0 +1,34 @@
+name: Build & Upload (Anroid)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: 3.24.1
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter gen-l10n
+
+      - name: Build
+        run: |
+          flutter build apk --release
+
+      - name: Upload Artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          name: app-release.apk
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          tag: v${{ github.run_number }}
+          commit: main
