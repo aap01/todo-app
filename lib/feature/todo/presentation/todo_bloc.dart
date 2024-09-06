@@ -43,7 +43,7 @@ class TodoBloc extends Cubit<TodoState> {
       final isSuccess = IsolateNameServer.registerPortWithName(
           _receivePort.sendPort, ServicePortNames.todo);
       if (isSuccess) {
-        debugPrint('ready to receive data from background for ${runtimeType}');
+        debugPrint('ready to receive data from background for $runtimeType');
         _receivePort.listen((data) {
           if (data == true) loadTodos();
         });

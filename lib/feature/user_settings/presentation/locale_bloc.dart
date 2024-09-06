@@ -35,7 +35,7 @@ class LocaleBloc extends Cubit<LocaleState> {
       final isSuccess = IsolateNameServer.registerPortWithName(
           _receivePort.sendPort, ServicePortNames.userSettings);
       if (isSuccess) {
-        debugPrint('ready to receive data from background for ${runtimeType}');
+        debugPrint('ready to receive data from background for $runtimeType');
         _receivePort.listen((data) {
           if (data == true) loadLocale();
         });
