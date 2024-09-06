@@ -2,6 +2,9 @@
 [![Deploy Web](https://github.com/aap01/todo-app/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/firebase-hosting-merge.yml)
 [![Format Analyze Test](https://github.com/aap01/todo-app/actions/workflows/format-analyze-test.yml/badge.svg)](https://github.com/aap01/todo-app/actions/workflows/format-analyze-test.yml)
 
+[![Watch Web Version](http://img.youtube.com/vi/UaIvo9WInn8/0.jpg)](https://youtu.be/UaIvo9WInn8)
+[![Watch Mobile Version](http://img.youtube.com/vi/feGklKr6Tg0/0.jpg)](https://youtu.be/feGklKr6Tg0)
+
 Organize and access your todos from anywhere, anytime
 See the live web application:
 # [https://todo-app-6ff79.web.app](https://todo-app-6ff79.web.app)
@@ -31,4 +34,5 @@ See the live web application:
 ```bash
 flutter gen-l10n # Generate localization files
 flutter run # For Chrome
+# And of course, get the credentials from me first :)
 ```
